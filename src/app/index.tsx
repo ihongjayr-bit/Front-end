@@ -2,7 +2,10 @@ import { API_URL } from '@/constants/api';
 import axios from 'axios';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
+
+import { Avatar, Feed, FeedItem, Message } from '../components/feed';
+import { colors } from '../constants/ui';
 
 export default function EventsScreen() {
   const params = useLocalSearchParams();
@@ -31,49 +34,61 @@ export default function EventsScreen() {
   // ---- detail view ----
   if (selectedId) {
     return (
-      <ScrollView style={styles.container}>
-        <TouchableOpacity onPress={() => router.setParams({ id: undefined })}>
-          <Text style={styles.back}>← Back to events</Text>
-        </TouchableOpacity>
+      <Feed title="Event" onBack={() => router.setParams({ id: undefined })}>
         {event ? (
-          <>
-            <Text style={styles.title}>{event.name}</Text>
-            <Text style={styles.date}>Date: {event.date}</Text>
-            <Text style={styles.description}>{event.description}</Text>
-          </>
+          <View style={styles.detail}>
+            <View style={styles.detailHead}>
+              <Avatar name={event.name} size={52} />
+              <Text style={styles.detailTitle}>{event.name}</Text>
+            </View>
+            <Text style={styles.detailBody}>{event.description}</Text>
+            <View style={styles.dateRow}>
+              <Text style={styles.dateText}>Date: {event.date}</Text>
+            </View>
+          </View>
         ) : (
-          <Text>Loading event...</Text>
+          <Message>Loading event...</Message>
         )}
-      </ScrollView>
+      </Feed>
     );
   }
 
   // ---- list view ----
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.header}>Upcoming Events</Text>
-      {loading ? <Text>Loading events...</Text> : events.length === 0 ? <Text>No events found.</Text> : null}
+    <Feed title="Upcoming Events">
+      {loading ? (
+        <Message>Loading events...</Message>
+      ) : events.length === 0 ? (
+        <Message>No events found.</Message>
+      ) : null}
       {events.map(e => (
-        <TouchableOpacity
+        <FeedItem
           key={e.id}
-          style={styles.card}
+          title={e.name}
+          body={e.description}
           onPress={() => router.setParams({ id: String(e.id) })}
-        >
-          <Text style={styles.cardTitle}>{e.name}</Text>
-          <Text>{e.description}</Text>
-        </TouchableOpacity>
+        />
       ))}
-    </ScrollView>
+    </Feed>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { padding: 20, paddingTop: 100, flex: 1, backgroundColor: '#fff' },
-  header: { fontSize: 24, fontWeight: 'bold', marginBottom: 15 },
-  card: { borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 15, marginBottom: 10 },
-  cardTitle: { fontSize: 18, fontWeight: '600', marginBottom: 5 },
-  back: { fontSize: 16, color: '#208AEF', marginBottom: 20 },
-  title: { fontSize: 26, fontWeight: 'bold', marginBottom: 10 },
-  date: { fontSize: 16, color: '#666', marginBottom: 15 },
-  description: { fontSize: 16, lineHeight: 24 },
+  detail: { padding: 16 },
+  detailHead: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
+  detailTitle: {
+    flex: 1,
+    marginLeft: 12,
+    fontSize: 24,
+    fontWeight: '800',
+    color: colors.text,
+  },
+  detailBody: { fontSize: 18, lineHeight: 27, color: colors.textBody },
+  dateRow: {
+    marginTop: 16,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+  },
+  dateText: { fontSize: 15, color: colors.textMuted },
 });

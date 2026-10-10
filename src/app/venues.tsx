@@ -1,7 +1,8 @@
 import { API_URL } from '@/constants/api';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+
+import { Feed, FeedItem } from '@/components/feed';
 
 export default function VenuesScreen() {
   const [venues, setVenues] = useState<any[]>([]);
@@ -13,21 +14,10 @@ export default function VenuesScreen() {
   }, []);
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.header}>Venues</Text>
+    <Feed title="Venues">
       {venues.map(v => (
-        <View key={v.id} style={styles.card}>
-          <Text style={styles.title}>{v.name}</Text>
-          <Text>{v.location}</Text>
-        </View>
+        <FeedItem key={v.id} title={v.name} body={v.location} />
       ))}
-    </ScrollView>
+    </Feed>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { padding: 20, flex: 1, backgroundColor: '#fff' },
-  header: { fontSize: 24, fontWeight: 'bold', marginBottom: 15 },
-  card: { borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 15, marginBottom: 10 },
-  title: { fontSize: 18, fontWeight: '600', marginBottom: 5 },
-});

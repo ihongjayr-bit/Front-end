@@ -1,9 +1,20 @@
+import Constants from 'expo-constants';
 import { Platform } from 'react-native';
 
-const LAN_IP = '192.168.1.40';
+const PORT = 8000;
+
+// Fallback: your PC's IPv4 address (run `ipconfig`, copy the Wi-Fi "IPv4 Address")
+const LAN_IP = '192.168.56.1';
+
+// Expo tells the app your PC's address (e.g. "192.168.1.40:8081"), so it
+// follows you if your IP changes. Only a plain IP is used, otherwise
+// (e.g. tunnel mode) it falls back to LAN_IP.
+const expoHost = Constants.expoConfig?.hostUri?.split(':')[0];
+const host = expoHost && /^\d+\.\d+\.\d+\.\d+$/.test(expoHost) ? expoHost : LAN_IP;
+
 export const API_URL = Platform.select({
-  android: 'http://10.0.2.2:8000/api', // Android emulator
-  ios: 'http://localhost:8000/api',    // iOS simulator
-  web: 'http://localhost:8000/api',
-  default: `http://${LAN_IP}:8000/api`,
-});
+  web: `http://localhost:${PORT}/api`,
+  android: `http://${host}:${PORT}/api`,
+  ios: `http://${host}:${PORT}/api`,
+  default: `http://${host}:${PORT}/api`,
+}) as string;
